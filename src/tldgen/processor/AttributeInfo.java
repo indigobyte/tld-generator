@@ -3,11 +3,11 @@
  * and open the template in the editor.
  */
 
-package tldgen.annotations;
+package tldgen.processor;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  */
 public class AttributeInfo {
     private String name;

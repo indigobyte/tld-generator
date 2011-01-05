@@ -3,14 +3,14 @@
  * and open the template in the editor.
  */
 
-package tldgen.annotations;
+package tldgen.processor;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  */
 public class TagInfo {
     private String name;
