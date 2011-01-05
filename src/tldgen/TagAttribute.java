@@ -21,6 +21,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface TagAttribute {
     
+    /**
+     * Indicates if the attributes is required.
+     * 
+     * @return true if the attribute is required.
+     */
     boolean isRequired() default false;
 
 }

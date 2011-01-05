@@ -9,7 +9,7 @@ package tldgen.processor;
  *
  * @author Victor Hugo Herrera Maldonado
  */
-public class AttributeInfo {
+class AttributeInfo {
     private String name;
     private boolean required;
     private String type;

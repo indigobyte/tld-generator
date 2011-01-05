@@ -9,7 +9,7 @@ package tldgen.processor;
  *
  * @author Victor Hugo Herrera Maldonado
  */
-public class FunctionInfo {
+class FunctionInfo {
     private String name;
     private String functionClass;
     private String functionSignature;

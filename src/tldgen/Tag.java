@@ -20,11 +20,19 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface Tag {
+    
     /**
      * Name of the tag
+     * 
+     * return tag name.
      */
-    String name() default "";
+    String value() default "";
     
+    /**
+     * Indicates if the tag can have a body.
+     * 
+     * @return true if the tag can have a body.
+     */
     boolean isContentAllowed() default false;
     
 }

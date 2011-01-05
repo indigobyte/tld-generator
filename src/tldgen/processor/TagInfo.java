@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Victor Hugo Herrera Maldonado
  */
-public class TagInfo {
+class TagInfo {
     private String name;
     private String tagClass;
     private boolean contentAllowed;

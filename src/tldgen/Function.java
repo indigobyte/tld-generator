@@ -20,5 +20,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface Function {
+    
+    /**
+     * Name of the function.
+     * 
+     * @return function name.
+     */
     String value() default "";
 }

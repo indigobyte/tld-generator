@@ -39,7 +39,8 @@ import tldgen.Tag;
 import tldgen.TagAttribute;
 
 /**
- *
+ * TLD Generator.
+ * 
  * @author Victor Hugo Herrera Maldonado
  */
 @SupportedAnnotationTypes("tldgen.*")
@@ -57,8 +58,8 @@ public class TLDGenerator extends AbstractProcessor{
                 TypeElement tElement=(TypeElement)e;
                 Tag tag = e.getAnnotation(Tag.class);
                 String tagName=null;
-                if(!tag.name().equals("")){
-                    tagName=tag.name();
+                if(!tag.value().equals("")){
+                    tagName=tag.value();
                 }else{
                     tagName=e.getSimpleName().toString();
                     if(tagName.endsWith("Tag")){
@@ -175,7 +176,7 @@ public class TLDGenerator extends AbstractProcessor{
             writer.writeCharacters("\n");
             writeWithContent(writer, "name", functionInfo.getName());
             writeWithContent(writer, "function-class", functionInfo.getFunctionClass());
-            writeWithContent(writer, "method-signature", functionInfo.getFunctionSignature());
+            writeWithContent(writer, "function-signature", functionInfo.getFunctionSignature());
             writeEndElement(writer);
         }
         
