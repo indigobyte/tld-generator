@@ -55,7 +55,6 @@ public class TLDGenerator extends AbstractProcessor{
         for(Element e: elements){
             if(e instanceof TypeElement){
                 TypeElement tElement=(TypeElement)e;
-                System.out.println("Tag: "+e);
                 Tag tag = e.getAnnotation(Tag.class);
                 String tagName=null;
                 if(!tag.name().equals("")){
@@ -67,7 +66,6 @@ public class TLDGenerator extends AbstractProcessor{
                     }
                 }
                 TagInfo tagInfo=new TagInfo(toAttributeName(tagName), tElement.asType().toString(), tag.isContentAllowed());
-                System.out.println("tag: "+tagInfo);
                 while(tElement != null){
                     List<ExecutableElement> methods = ElementFilter.methodsIn(tElement.getEnclosedElements());
                     for(ExecutableElement method: methods){
@@ -75,7 +73,6 @@ public class TLDGenerator extends AbstractProcessor{
                             TagAttribute tagAttribute=method.getAnnotation(TagAttribute.class);
                             AttributeInfo attributeInfo=new AttributeInfo(getAttributeName(method), tagAttribute.isRequired(), method.getParameters().get(0).asType().toString());
                             tagInfo.getAttributes().add(attributeInfo);
-                            System.out.println("attribute: "+attributeInfo);
                         }
                     }
                     TypeMirror superclass = tElement.getSuperclass();
@@ -95,7 +92,6 @@ public class TLDGenerator extends AbstractProcessor{
             if(e.getModifiers().contains(Modifier.STATIC) && e.getModifiers().contains(Modifier.PUBLIC)){
                 Function f=e.getAnnotation(Function.class);
                 FunctionInfo info=new FunctionInfo(f.value().equals("") ? executable.getSimpleName().toString(): f.value(), executable.getEnclosingElement().asType().toString(), getSignature(executable));
-                System.out.println("function: "+info);
                 functions.add(info);
             }else{
                 processingEnv.getMessager().printMessage(Kind.WARNING, "Function method must be public static. This will be omited in declaration.", e);
@@ -105,9 +101,9 @@ public class TLDGenerator extends AbstractProcessor{
             try{
                 generateXML(processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/taglib.tld", new Element[0]));
             }catch(XMLStreamException ex){
-                ex.printStackTrace();
+                processingEnv.getMessager().printMessage(Kind.ERROR, "Problem while generating TLD: "+ ex.toString());
             }catch(IOException ex){
-                ex.printStackTrace();
+                processingEnv.getMessager().printMessage(Kind.ERROR, "Problem while generating TLD: "+ ex.toString());
             }
         }
         return true;
@@ -158,13 +154,8 @@ public class TLDGenerator extends AbstractProcessor{
         writeWithContent(writer, "short-name", properties.getProperty("short-name", ""));
         writeWithContent(writer, "uri", properties.getProperty("uri", ""));
         for(TagInfo tagInfo: tags){
-//            myWriter.startElement("tag");
-            
             writeStartElement(writer, "tag");
             writer.writeCharacters("\n");
-            
-//            myWriter.startElement("name").setContent(tagInfo.getName());
-            
             writeWithContent(writer, "name", tagInfo.getName());
             writeWithContent(writer, "tag-class", tagInfo.getTagClass());
             writeWithContent(writer, "body-content", tagInfo.isContentAllowed()? "scriptless": "empty");
@@ -208,7 +199,6 @@ public class TLDGenerator extends AbstractProcessor{
         builder.append(" ");
         builder.append(e.getSimpleName().toString());
         builder.append('(');
-        System.out.println("number of parameters: "+e.getParameters());
         for(VariableElement parameter:e.getParameters()){
             builder.append(parameter.asType().toString());
             builder.append(',');
