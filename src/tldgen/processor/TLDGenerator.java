@@ -7,9 +7,11 @@ package tldgen.processor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -49,6 +51,18 @@ public class TLDGenerator extends AbstractProcessor{
     private List<TagInfo> tags=new LinkedList<TagInfo>();
     private List<FunctionInfo> functions=new LinkedList<FunctionInfo>();
     
+    private static Map<String, String> nativeTypes=new HashMap<String, String>();
+    
+    {
+        nativeTypes.put("byte", "java.lang.Byte");
+        nativeTypes.put("short", "java.lang.Short");
+        nativeTypes.put("int", "java.lang.Integer");
+        nativeTypes.put("long", "java.lang.Long");
+        nativeTypes.put("float", "java.lang.Float");
+        nativeTypes.put("double", "java.lang.Double");
+        nativeTypes.put("boolean", "java.lang.Boolean");
+    }
+    
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Set<Element> elements=new HashSet<Element>();
@@ -72,7 +86,11 @@ public class TLDGenerator extends AbstractProcessor{
                     for(ExecutableElement method: methods){
                         if(isSetter(method) && method.getAnnotation(TagAttribute.class) != null){
                             TagAttribute tagAttribute=method.getAnnotation(TagAttribute.class);
-                            AttributeInfo attributeInfo=new AttributeInfo(getAttributeName(method), tagAttribute.isRequired(), method.getParameters().get(0).asType().toString());
+                            String type = method.getParameters().get(0).asType().toString();
+                            if(nativeTypes.containsKey(type)){
+                                type=nativeTypes.get(type);
+                            }
+                            AttributeInfo attributeInfo=new AttributeInfo(getAttributeName(method), tagAttribute.isRequired(), type);
                             tagInfo.getAttributes().add(attributeInfo);
                         }
                     }
