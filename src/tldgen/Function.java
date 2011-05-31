@@ -27,4 +27,13 @@ public @interface Function {
      * @return function name.
      */
     String value() default "";
+    
+    String description() default "";
+    
+    String displayName() default "";
+    
+    String icon() default "";
+    
+    String example() default "";
+    
 }

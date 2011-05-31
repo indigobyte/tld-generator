@@ -26,6 +26,10 @@ public @interface TagAttribute {
      * 
      * @return true if the attribute is required.
      */
-    boolean isRequired() default false;
+    boolean required() default false;
+    
+    String description() default "";
+    
+    boolean runtimeValueAllowed() default false;
 
 }

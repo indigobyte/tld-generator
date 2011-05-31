@@ -28,11 +28,14 @@ public @interface Tag {
      */
     String value() default "";
     
-    /**
-     * Indicates if the tag can have a body.
-     * 
-     * @return true if the tag can have a body.
-     */
-    boolean isContentAllowed() default false;
+    String description() default "";
+    
+    String displayName() default "";
+    
+    String icon() default "";
+    
+    String example() default "";
+    
+    BodyContentType bodyContentType() default BodyContentType.EMPTY;
     
 }
