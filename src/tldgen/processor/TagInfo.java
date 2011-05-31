@@ -7,42 +7,105 @@ package tldgen.processor;
 
 import java.util.LinkedList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+import tldgen.BodyContentType;
 
 /**
  *
  * @author Victor Hugo Herrera Maldonado
+ * TODO missing tei-class, variable, tag-extension
  */
+@XmlType(propOrder={"description", "displayName", "icon", "name", "tagClass", "bodyContentType", "attributes", "dynamicAttributesAccepted", "example"})
 class TagInfo {
     private String name;
+    private String description;
+    private String displayName;
+    private String icon;
+    private String example;
     private String tagClass;
-    private boolean contentAllowed;
+    private BodyContentType bodyContentType;
+    private boolean dynamicAttributesAccepted;
     private List<AttributeInfo> attributes=new LinkedList<AttributeInfo>();
+    
+    protected TagInfo(){
+        
+    }
 
-    public TagInfo(String name, String tagClass, boolean isContentAllowed) {
+    public TagInfo(String name, String tagClass, BodyContentType type) {
         this.name = name;
         this.tagClass = tagClass;
-        this.contentAllowed = isContentAllowed;
+        this.bodyContentType=type;
     }
 
-    public boolean isContentAllowed() {
-        return contentAllowed;
+    @XmlElement(name="body-content")
+    public BodyContentType getBodyContentType() {
+        return bodyContentType;
     }
-
+    
+    @XmlElement(name="tag-class")
     public String getTagClass() {
         return tagClass;
     }
     
+    @XmlElement
     public String getName() {
         return name;
     }
+
+    @XmlElement
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @XmlElement(name="display-name")
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @XmlElement
+    public String getExample() {
+        return example;
+    }
+
+    public void setExample(String example) {
+        this.example = example;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    @XmlElement
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
     
+    @XmlElement(name="attribute")
     public List<AttributeInfo> getAttributes() {
         return attributes;
     }
 
     @Override
     public String toString() {
-        return "TagInfo{" + "name=" + name + ", tagClass=" + tagClass + ", isContentAllowed=" + contentAllowed + ", attributes=" + attributes + '}';
+        return "TagInfo{" + "name=" + name + ", tagClass=" + tagClass + ", bodyContentType=" + bodyContentType + ", attributes=" + attributes + '}';
     }
 
+    public void setDynamicAttributesAccepted(boolean b) {
+        this.dynamicAttributesAccepted=b;
+    }
+
+    @XmlElement(name="dynamic-attributes")
+    public boolean isDynamicAttributesAccepted() {
+        return dynamicAttributesAccepted;
+    }
+    
 }
