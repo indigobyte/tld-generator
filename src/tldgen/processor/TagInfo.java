@@ -14,9 +14,9 @@ import tldgen.BodyContentType;
 /**
  *
  * @author Victor Hugo Herrera Maldonado
- * TODO missing tei-class, variable, tag-extension
+ * TODO missing tei-class, variable
  */
-@XmlType(propOrder={"description", "displayName", "icon", "name", "tagClass", "bodyContentType", "attributes", "dynamicAttributesAccepted", "example"})
+@XmlType(propOrder={"description", "displayName", "icon", "name", "tagClass", "teiClass", "bodyContentType", "variables", "attributes", "dynamicAttributesAccepted", "example"})
 class TagInfo {
     private String name;
     private String description;
@@ -24,9 +24,11 @@ class TagInfo {
     private String icon;
     private String example;
     private String tagClass;
+    private String teiClass;
     private BodyContentType bodyContentType;
     private boolean dynamicAttributesAccepted;
     private List<AttributeInfo> attributes=new LinkedList<AttributeInfo>();
+    private List<VariableInfo> variables=new LinkedList<VariableInfo>();
     
     protected TagInfo(){
         
@@ -53,6 +55,15 @@ class TagInfo {
         return name;
     }
 
+    @XmlElement(name="tei-class")
+    public String getTeiClass() {
+        return teiClass;
+    }
+
+    public void setTeiClass(String teiClass) {
+        this.teiClass = teiClass;
+    }
+    
     @XmlElement
     public String getDescription() {
         return description;
@@ -94,6 +105,11 @@ class TagInfo {
         return attributes;
     }
 
+    @XmlElement(name="variable")
+    public List<VariableInfo> getVariables() {
+        return variables;
+    }
+    
     @Override
     public String toString() {
         return "TagInfo{" + "name=" + name + ", tagClass=" + tagClass + ", bodyContentType=" + bodyContentType + ", attributes=" + attributes + '}';

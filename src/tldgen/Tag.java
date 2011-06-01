@@ -10,13 +10,14 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import javax.servlet.jsp.tagext.TagExtraInfo;
 
 /**
  * Indicates that a class is a tag handler.
  * 
  * @author Victor Hugo Herrera Maldonado
  */
-@Documented
+//@Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface Tag {
@@ -37,5 +38,9 @@ public @interface Tag {
     String example() default "";
     
     BodyContentType bodyContentType() default BodyContentType.EMPTY;
+    
+    Class<? extends TagExtraInfo> teiClass() default TagExtraInfo.class;
+    
+    Variable[] variables() default {};
     
 }

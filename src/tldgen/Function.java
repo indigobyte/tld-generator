@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  *  
  * @author Victor Hugo Herrera Maldonado
  */
-@Documented
+//@Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface Function {

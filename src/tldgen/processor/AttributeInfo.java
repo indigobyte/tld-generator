@@ -14,13 +14,15 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * TODO missing deferred value and method
  */
-@XmlType(propOrder={"description", "name", "required", "runtimeValueAllowed", "type", "jspFragment"})
+@XmlType(propOrder={"description", "name", "required", "runtimeValueAllowed", "type", "jspFragment", "deferredValue", "deferredMethod"})
 class AttributeInfo {
     private String name;
     private String description;
     private boolean required;
     private String type;
     private boolean runtimeValueAllowed;
+    private DeferredValueInfo deferredValue;
+    private DeferredMethodInfo deferredMethod;
 
     protected AttributeInfo() {
     }
@@ -68,6 +70,24 @@ class AttributeInfo {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @XmlElement(name="deferred-method")
+    public DeferredMethodInfo getDeferredMethod() {
+        return deferredMethod;
+    }
+
+    public void setDeferredMethod(DeferredMethodInfo deferredMethod) {
+        this.deferredMethod = deferredMethod;
+    }
+
+    @XmlElement(name="deferred-value")
+    public DeferredValueInfo getDeferredValue() {
+        return deferredValue;
+    }
+
+    public void setDeferredValue(DeferredValueInfo deferredValue) {
+        this.deferredValue = deferredValue;
     }
     
     @XmlElement(name="fragment")

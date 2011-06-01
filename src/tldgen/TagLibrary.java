@@ -4,15 +4,20 @@
  */
 package tldgen;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import javax.servlet.jsp.tagext.JspTag;
 
 /**
  *
  * @author Victor
  */
+//@Documented
 @Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.PACKAGE)
 public @interface TagLibrary {
     
     String value();
@@ -31,7 +36,7 @@ public @interface TagLibrary {
     
     Class<? extends JspTag>[] tagHandlers() default {};
     
-    String[] tagFiles() default {};
+    TagFile[] tagFiles() default {};
     
     Class<?>[] functionClasses() default {};
     
