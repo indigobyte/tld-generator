@@ -5,6 +5,7 @@
 package tldgen.processor;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -398,100 +399,11 @@ public class TLDGenerator extends AbstractProcessor {
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd");
-        m.marshal(libraryInfo, file.openWriter());
+        Writer writer = file.openWriter();
+        m.marshal(libraryInfo, writer);
+        writer.close();
     }
     
-//    private int level;
-//
-//    private void generateXML(FileObject file) throws XMLStreamException, IOException {
-//        XMLOutputFactory factory = XMLOutputFactory.newInstance();
-//        factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-//        FileObject resource = processingEnv.getFiler().getResource(StandardLocation.SOURCE_PATH, "", "META-INF/taglib.properties");
-//
-//        Properties properties = new Properties();
-//        InputStream input = resource.openInputStream();
-//        properties.load(input);
-//        input.close();
-//        level = 0;
-//        XMLStreamWriter writer = factory.createXMLStreamWriter(file.openWriter());
-//        writer.writeStartDocument("UTF-8", "1.0");
-//        writer.setDefaultNamespace("http://java.sun.com/xml/ns/javaee");
-//        writer.setPrefix("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-//        writer.writeCharacters("\n");
-//
-//        writeStartElement(writer, "tag-lib");
-//        writer.writeAttribute("version", "2.1");
-//        writer.writeAttribute("xsi:schemaLocation", "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd");
-//        writer.writeCharacters("\n");
-//        writeWithContent(writer, "tlib-version", properties.getProperty("tlib-version", "1.0"));
-//        writeWithContent(writer, "short-name", properties.getProperty("short-name", ""));
-//        writeWithContent(writer, "uri", properties.getProperty("uri", ""));
-//        for (TagInfo tagInfo : tagMap.values()) {
-//            writeStartElement(writer, "tag");
-//            writer.writeCharacters("\n");
-//            writeWithContent(writer, "name", tagInfo.getName());
-//            writeWithContent(writer, "tag-class", tagInfo.getTagClass());
-//            writeWithContent(writer, "body-content", tagInfo.getBodyContentType().toString());
-//            for (AttributeInfo attributeInfo : tagInfo.getAttributes()) {
-//                writeStartElement(writer, "attribute");
-//                writer.writeCharacters("\n");
-//                writeWithContent(writer, "name", attributeInfo.getName());
-//                writeWithContent(writer, "type", attributeInfo.getType());
-//                writeWithContent(writer, "required", String.valueOf(attributeInfo.isRequired()));
-//                writeWithContent(writer, "rtexprvalue", String.valueOf(attributeInfo.isRuntimeValue()));
-//                writeWithContent(writer, "fragment", String.valueOf(attributeInfo.isJspFragment()));
-//                writeEndElement(writer); //attribute
-//            }
-//            writeEndElement(writer); //tag
-//        }
-//
-//        for (FunctionInfo functionInfo : functions) {
-////            writeAsElement(function, "name", "functionClass", "functionSignature");
-//
-//            writeStartElement(writer, "function");
-//            writer.writeCharacters("\n");
-//            writeWithContent(writer, "name", functionInfo.getName());
-//            writeWithContent(writer, "function-class", functionInfo.getFunctionClass());
-//            writeWithContent(writer, "function-signature", functionInfo.getFunctionSignature());
-//            writeEndElement(writer);
-//        }
-//
-//        writeEndElement(writer); //tag-lib
-//        writer.writeCharacters("\n");
-//        writer.writeEndDocument();
-//        writer.flush();
-//        writer.close();
-//    }
-//
-//    private void spacer(int level, XMLStreamWriter writer) throws XMLStreamException {
-//        for (int i = 0; i < level; i++) {
-//            for (int j = 0; j < 4; j++) {
-//                writer.writeCharacters(" ");
-//            }
-//        }
-//    }
-//
-//    private void writeWithContent(XMLStreamWriter writer, String tag, String content) throws XMLStreamException {
-//        spacer(level, writer);
-//        writer.writeStartElement(tag);
-//        writer.writeCharacters(content);
-//        writer.writeEndElement();
-//        writer.writeCharacters("\n");
-//    }
-//
-//    private void writeStartElement(XMLStreamWriter writer, String tag) throws XMLStreamException {
-//        spacer(level, writer);
-//        writer.writeStartElement(tag);
-//        level++;
-//    }
-//
-//    private void writeEndElement(XMLStreamWriter writer) throws XMLStreamException {
-//        level--;
-//        spacer(level, writer);
-//        writer.writeEndElement();
-//        writer.writeCharacters("\n");
-//    }
-
     private class AnnotationMirrorWrapper {
 
         private AnnotationMirror mirror;
@@ -540,4 +452,5 @@ public class TLDGenerator extends AbstractProcessor {
         }
         
     }
+    
 }
