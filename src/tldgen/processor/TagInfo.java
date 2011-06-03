@@ -1,13 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package tldgen.processor;
 
 import java.util.LinkedList;
 import java.util.List;
-import javax.lang.model.element.PackageElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import tldgen.BodyContentType;
@@ -15,7 +9,6 @@ import tldgen.BodyContentType;
 /**
  *
  * @author Victor Hugo Herrera Maldonado
- * TODO missing tei-class, variable
  */
 @XmlType(propOrder={"description", "displayName", "icon", "name", "tagClass", "teiClass", "bodyContentType", "variables", "attributes", "dynamicAttributesAccepted", "example"})
 class TagInfo {

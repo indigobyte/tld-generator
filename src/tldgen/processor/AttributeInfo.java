@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package tldgen.processor;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -12,7 +7,6 @@ import javax.xml.bind.annotation.XmlType;
  *
  * @author Victor Hugo Herrera Maldonado
  * 
- * TODO missing deferred value and method
  */
 @XmlType(propOrder={"description", "name", "required", "runtimeValueAllowed", "type", "jspFragment", "deferredValue", "deferredMethod"})
 class AttributeInfo {
@@ -60,7 +54,6 @@ class AttributeInfo {
     }
 
     public void setRuntimeValueAllowed(Boolean b) {
-        System.out.println("runtimeValueAllowed: "+b);
         this.runtimeValueAllowed = b;
     }
 

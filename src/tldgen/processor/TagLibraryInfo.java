@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen.processor;
 
 import java.util.LinkedList;
@@ -15,10 +11,10 @@ import javax.xml.bind.annotation.XmlType;
  *
  * @author Victor
  * 
- * TODO missing validator, listener, tag-file
  */
 @XmlRootElement(name="taglib")
-@XmlType(propOrder={"description", "displayName", "icon", "libraryVersion", "shortName", "uri", "validator", "webListeners", "tagFiles", "tagHandlers", "functions"})
+@XmlType(propOrder={"description", "displayName", "icon", "libraryVersion", "shortName", 
+            "uri", "validator", "webListeners", "tagFiles", "tagHandlers", "functions"})
 public class TagLibraryInfo {
     private String uri;
     private String description;

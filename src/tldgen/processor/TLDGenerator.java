@@ -358,12 +358,6 @@ public class TLDGenerator extends AbstractProcessor {
         Map<? extends ExecutableElement, ? extends AnnotationValue> annotationValues = processingEnv.getElementUtils().getElementValuesWithDefaults(annotationMirror);
             try{
                 for(PropertyDescriptor descriptor:Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors()){
-                    if(bean.getClass().equals(VariableInfo.class)){
-                        System.out.println("property: "+descriptor.getShortDescription());
-                        System.out.println("type: "+descriptor.getPropertyType());
-                        System.out.println("read: "+descriptor.getReadMethod());
-                        System.out.println("write: "+descriptor.getWriteMethod());
-                    }
                     for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationValues.entrySet()) {
                         if(entry.getKey().getSimpleName().contentEquals(descriptor.getName())){
                             XmlElement annotation = descriptor.getReadMethod().getAnnotation(XmlElement.class);
@@ -376,18 +370,9 @@ public class TLDGenerator extends AbstractProcessor {
                                     }
                                 }
                             }
-                            if(bean.getClass().equals(VariableInfo.class)){
-                                System.out.println("annotation Value: "+value);
-                                System.out.println("class: "+value.getClass());
-                                if(annotation != null){
-                                    System.out.println("default value: "+annotation.defaultValue());
-                                }
-                            }
                             if(annotation == null || !annotation.defaultValue().equals(value.toString())){
                                 if(!value.equals("") && descriptor.getWriteMethod() != null){
-                                    if(!value.getClass().equals(descriptor.getPropertyType())){
-                                        System.out.println("mismatch: "+descriptor.getName());
-                                    }else{
+                                    if(value.getClass().equals(descriptor.getPropertyType())){
                                         descriptor.getWriteMethod().invoke(bean, value);
                                     }
                                 }
