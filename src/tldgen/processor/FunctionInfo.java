@@ -5,6 +5,7 @@
 
 package tldgen.processor;
 
+import javax.lang.model.element.PackageElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -82,7 +83,7 @@ class FunctionInfo {
     public void setIcon(String icon) {
         this.icon = icon;
     }
-    
+
     @Override
     public String toString() {
         return "FunctionInfo{" + "name=" + name + ", functionClass=" + functionClass + ", functionSignature=" + functionSignature + '}';

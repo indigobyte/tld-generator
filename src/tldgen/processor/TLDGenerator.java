@@ -24,6 +24,7 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -57,13 +58,7 @@ import tldgen.VariableScope;
 @SupportedAnnotationTypes("tldgen.*")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class TLDGenerator extends AbstractProcessor {
-
-    
-    private Map<String, TagInfo> tagMap = new HashMap<String, TagInfo>();
-    private List<FunctionInfo> functions = new LinkedList<FunctionInfo>();
-    private Map<String, ValidatorInfo> validatorMap=new HashMap<String, ValidatorInfo>();
-    private Map<String, WebListenerInfo> webListenerMap=new HashMap<String, WebListenerInfo>();
-    private List<AnnotationMirrorWrapper> libraries = new LinkedList<AnnotationMirrorWrapper>();
+    private List<TagLibraryWrapper> libraries=new LinkedList<TagLibraryWrapper>();
     
     private static Map<String, String> nativeTypes = new HashMap<String, String>();
     {
@@ -79,13 +74,36 @@ public class TLDGenerator extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        for (Element e : roundEnv.getElementsAnnotatedWith(TagLibrary.class)) {
+            AnnotationMirrorWrapper wrapper=getAnnotationMirrorWrapper(e, TagLibrary.class);
+            PackageElement libraryPackage = processingEnv.getElementUtils().getPackageOf(e);
+            TagLibraryInfo libraryInfo = new TagLibraryInfo(wrapper.getValueAsString("value"));
+            copyAnnotationValuesToBean(wrapper.getMirror(), libraryInfo);
+            TagLibraryWrapper library = new TagLibraryWrapper(wrapper.getValueAsString("descriptorFile"), libraryPackage, libraryInfo);
+            
+            library.getTagHandlerClasses().addAll(wrapper.getValueAsClassnameList("tagHandlers"));
+            library.getFunctionClasses().addAll(wrapper.getValueAsClassnameList("functionClasses"));
+            library.getWebListenerClasses().addAll(wrapper.getValueAsClassnameList("webListeners"));
+            
+            String validatorClassname=wrapper.getValueAsClassname("validator");
+            if(!validatorClassname.equals("javax.servlet.jsp.tagext.TagLibraryValidator")){
+                library.setValidatorClass(validatorClassname);
+            }
+            for(AnnotationMirror mirror: wrapper.getValueAsAnnotationMirrorList("tagFiles")){
+                TagFileInfo tagFileInfo=new TagFileInfo();
+                copyAnnotationValuesToBean(mirror, tagFileInfo);
+                libraryInfo.getTagFiles().add(tagFileInfo);
+            }
+            libraries.add(library);
+        }
+        
         for (Element e : roundEnv.getElementsAnnotatedWith(Tag.class)) {
             if (e instanceof TypeElement) {
                 TypeElement tElement = (TypeElement)e;
-                AnnotationMirrorWrapper tagMirrorWrapper=new AnnotationMirrorWrapper(getAnnotationMirror(e, Tag.class)) ;
+                AnnotationMirrorWrapper tagMirrorWrapper=getAnnotationMirrorWrapper(e, Tag.class);
                 String tagName = null;
-                if (!tagMirrorWrapper.getValue("value").equals("")) {
-                    tagName = tagMirrorWrapper.getValue("value").toString();
+                if (!tagMirrorWrapper.getValueAsString("value").equals("")) {
+                    tagName = tagMirrorWrapper.getValueAsString("value");
                 } else {
                     tagName = e.getSimpleName().toString();
                     if (tagName.endsWith("Tag")) {
@@ -96,16 +114,16 @@ public class TLDGenerator extends AbstractProcessor {
                 TagInfo tagInfo = new TagInfo(toAttributeName(tagName), e.asType().toString(), BodyContentType.valueOf(value.toString()));
                 copyAnnotationValuesToBean(tagMirrorWrapper.getMirror(), tagInfo);
                 
-                if(!tagMirrorWrapper.getValue("teiClass").toString().replace(".class", "").equals("javax.servlet.jsp.tagext.TagExtraInfo")){
-                    tagInfo.setTeiClass(tagMirrorWrapper.getValue("teiClass").toString().replace(".class", ""));
+                if(!tagMirrorWrapper.getValueAsClassname("teiClass").equals("javax.servlet.jsp.tagext.TagExtraInfo")){
+                    tagInfo.setTeiClass(tagMirrorWrapper.getValueAsClassname("teiClass"));
                 }
                 
-                for(AnnotationMirror mirror:(List<AnnotationMirror>)tagMirrorWrapper.getValue("variables")){
+                for(AnnotationMirror mirror:tagMirrorWrapper.getValueAsAnnotationMirrorList("variables")){
                     VariableInfo info=new VariableInfo();
                     AnnotationMirrorWrapper mirrorWrapper=new AnnotationMirrorWrapper(mirror);
                     copyAnnotationValuesToBean(mirrorWrapper.getMirror(), info);
-                    info.setNameFromAttribute(mirrorWrapper.getValue("nameFromAttribute").toString());
-                    info.setNameGiven(mirrorWrapper.getValue("nameGiven").toString());
+                    info.setNameFromAttribute(mirrorWrapper.getValueAsString("nameFromAttribute"));
+                    info.setNameGiven(mirrorWrapper.getValueAsString("nameGiven"));
                     if(info.getNameFromAttribute().equals("")){
                         info.setNameFromAttribute(null);
                     }
@@ -115,8 +133,8 @@ public class TLDGenerator extends AbstractProcessor {
                     if(info.getNameFromAttribute() != null && info.getNameGiven()!= null){
                         processingEnv.getMessager().printMessage(Kind.ERROR, "nameFromAttribute and nameGiven can not be presented at the same time.", e);
                     }
-                    info.setVariableClass(mirrorWrapper.getValue("type").toString().replace(".class", ""));
-                    info.setScope(VariableScope.valueOf(mirrorWrapper.getValue("scope").toString()));
+                    info.setVariableClass(mirrorWrapper.getValueAsClassname("type"));
+                    info.setScope(VariableScope.valueOf(mirrorWrapper.getValueAsString("scope")));
                     tagInfo.getVariables().add(info);
                 }
 
@@ -143,7 +161,7 @@ public class TLDGenerator extends AbstractProcessor {
                             DeferredValueInfo info=new DeferredValueInfo();
                             AnnotationMirrorWrapper mirrorWrapper=getAnnotationMirrorWrapper(m, DeferredValue.class);
                             if(mirrorWrapper != null){
-                                info.setType(mirrorWrapper.getValue("value").toString().replace(".class", ""));
+                                info.setType(mirrorWrapper.getValueAsClassname("value"));
                             }
                             attributeInfo.setDeferredValue(info);
                         }else if(type.equals("javax.el.MethodExpression")){
@@ -151,7 +169,7 @@ public class TLDGenerator extends AbstractProcessor {
                             attributeInfo.setDeferredMethod(info);
                             AnnotationMirrorWrapper mirrorWrapper=getAnnotationMirrorWrapper(m, DeferredMethod.class);
                             if(mirrorWrapper != null){
-                                info.setSignature(mirrorWrapper.getValue("value").toString().replace(".class", ""));
+                                info.setSignature(mirrorWrapper.getValueAsClassname("value"));
                             }
                             attributeInfo.setDeferredMethod(info);
                         }
@@ -162,14 +180,13 @@ public class TLDGenerator extends AbstractProcessor {
                             copyAnnotationValuesToBean(mirrorWrapper.getMirror(), info);
                             info.setNameFromAttribute(attributeInfo.getName());
                             info.setNameGiven(null);
-                            info.setVariableClass(mirrorWrapper.getValue("type").toString().replace(".class", ""));
-                            info.setScope(VariableScope.valueOf(mirrorWrapper.getValue("scope").toString()));
+                            info.setVariableClass(mirrorWrapper.getValueAsClassname("type"));
+                            info.setScope(VariableScope.valueOf(mirrorWrapper.getValueAsString("scope")));
                             tagInfo.getVariables().add(info);
                         }
                         tagInfo.getAttributes().add(attributeInfo);
                     }
                 }
-                
                 
                 /* Look into the parent classes */
                 do{
@@ -187,21 +204,31 @@ public class TLDGenerator extends AbstractProcessor {
                         tElement = (TypeElement) ((DeclaredType) superclass).asElement();
                     }
                 } while( tElement != null );
-                tagMap.put(tagInfo.getTagClass(), tagInfo);
+                for(TagLibraryWrapper library: libraries){
+                    if( library.getTagHandlerClasses().contains(tagInfo.getTagClass()) || 
+                        (library.getTagHandlerClasses().isEmpty() && haveSamePackage(library, e) )){
+                        library.getInfo().getTagHandlers().add(tagInfo);
+                    }
+                }
             }
+            
         }
         
         for (Element e : roundEnv.getElementsAnnotatedWith(Function.class)) {
-            ExecutableElement executable = (ExecutableElement) e;
             if (e.getModifiers().contains(Modifier.STATIC) && e.getModifiers().contains(Modifier.PUBLIC)) {
                 AnnotationMirrorWrapper functionMirrorWrapper=new AnnotationMirrorWrapper(getAnnotationMirror(e, Function.class));
-                String functionName=functionMirrorWrapper.getValue("value").toString();
+                String functionName=functionMirrorWrapper.getValueAsString("value");
                 if(functionName.equals("")){
-                    functionName=executable.getSimpleName().toString();
+                    functionName=e.getSimpleName().toString();
                 }
-                FunctionInfo info = new FunctionInfo(functionName, executable.getEnclosingElement().asType().toString(), getSignature(executable));
+                FunctionInfo info = new FunctionInfo(functionName, e.getEnclosingElement().asType().toString(), getSignature((ExecutableElement)e));
                 copyAnnotationValuesToBean(functionMirrorWrapper.getMirror(), info);
-                functions.add(info);
+                for(TagLibraryWrapper library: libraries){
+                    if( library.getFunctionClasses().contains(info.getFunctionClass()) || 
+                        (library.getFunctionClasses().isEmpty() && haveSamePackage(library, e) )){
+                        library.getInfo().getFunctions().add(info);
+                    }
+                }
             } else {
                 processingEnv.getMessager().printMessage(Kind.WARNING, "Function method must be public static. This will be omited in declaration.", e);
             }
@@ -216,46 +243,31 @@ public class TLDGenerator extends AbstractProcessor {
                 copyAnnotationValuesToBean(param, paramInfo);
                 validatorInfo.getParameters().add(paramInfo);
             }
-            validatorMap.put(validatorInfo.getValidatorClass(), validatorInfo);
+            for(TagLibraryWrapper library: libraries){
+                if( (library.getValidatorClass() != null && library.getValidatorClass().equals(validatorInfo.getValidatorClass()))||
+                    ( library.getValidatorClass() == null && haveSamePackage(library, e) )){
+                    if(library.getInfo().getValidator() != null){
+                        processingEnv.getMessager().printMessage(Kind.ERROR, "There can be only one validator per tag library.");
+                    }
+                    library.getInfo().setValidator(validatorInfo);
+                }
+            }
         }
         
         for(Element e: roundEnv.getElementsAnnotatedWith(WebListener.class)){
             WebListenerInfo webListenerInfo=new WebListenerInfo(e.asType().toString());
-            webListenerMap.put(webListenerInfo.getListenerClass(), webListenerInfo);
-        }
-        
-        for (Element e : roundEnv.getElementsAnnotatedWith(TagLibrary.class)) {
-            libraries.add(new AnnotationMirrorWrapper(getAnnotationMirror(e, TagLibrary.class)));
+            for(TagLibraryWrapper library: libraries){
+                if( library.getWebListenerClasses().contains(webListenerInfo.getListenerClass()) || 
+                        (library.getWebListenerClasses().isEmpty() && haveSamePackage(library, e)) ){
+                    library.getInfo().getWebListeners().add(webListenerInfo);
+                }
+            }
         }
         
         if (!roundEnv.processingOver()) {
-            Map<String, TagLibraryInfo> libraryMap = new HashMap<String, TagLibraryInfo>();
-            for (AnnotationMirrorWrapper wrapper : libraries) {
-                TagLibraryInfo libraryInfo = new TagLibraryInfo(wrapper.getValue("value").toString());
-                copyAnnotationValuesToBean(wrapper.getMirror(), libraryInfo);
-
-                for (Object s : ((List) wrapper.getValue("tagHandlers"))) {
-                    TagInfo tagInfo = tagMap.get(s.toString().replace(".class", ""));
-                    libraryInfo.getTagHandlers().add(tagInfo);
-                }
-                for(FunctionInfo functionInfo: functions){
-                    for (Object s : ((List) wrapper.getValue("functionClasses"))) {
-                        if(s.toString().replace(".class", "").equals(functionInfo.getFunctionClass())){
-                            libraryInfo.getFunctions().add(functionInfo);
-                        }
-                    }
-                }
-                for(Object o:(List)wrapper.getValue("tagFiles")){
-                    AnnotationMirrorWrapper tagFileMirror=new AnnotationMirrorWrapper((AnnotationMirror)o);
-                    TagFileInfo tagFileInfo=new TagFileInfo();
-                    copyAnnotationValuesToBean(tagFileMirror.getMirror(), tagFileInfo);
-                    libraryInfo.getTagFiles().add(tagFileInfo);
-                }
-                libraryMap.put(wrapper.getValue("descriptorFile").toString(), libraryInfo);
-            }
             try {
-                for (Map.Entry<String, TagLibraryInfo> entry : libraryMap.entrySet()) {
-                    generateXML(entry.getValue(), entry.getKey());
+                for (TagLibraryWrapper library: libraries) {
+                    generateXML(library.getInfo(), library.getDescriptorFile());
                 }
             } catch (JAXBException ex) {
                 processingEnv.getMessager().printMessage(Kind.ERROR, "Problem while generating TLD: " + ex.toString());
@@ -300,6 +312,10 @@ public class TLDGenerator extends AbstractProcessor {
         }
         builder.append(')');
         return builder.toString();
+    }
+    
+    private boolean haveSamePackage(TagLibraryWrapper library, Element e){
+        return library.getPackage().getQualifiedName().equals(processingEnv.getElementUtils().getPackageOf(e).getQualifiedName());
     }
     
     private AnnotationMirrorWrapper getAnnotationMirrorWrapper(Element e, Class<? extends Annotation> klass) {
@@ -363,15 +379,7 @@ public class TLDGenerator extends AbstractProcessor {
                 name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
                 Method setter = null;
                 try{
-                    if(bean.getClass().equals(VariableInfo.class)){
-                        System.out.println("type: "+type);
-                        System.out.println("set" + name);
-                    }
                     setter=bean.getClass().getMethod("set" + name, type);
-                    if(bean.getClass().equals(VariableInfo.class)){
-                        System.out.println("setter: "+setter);
-                    }
-                    
                 }catch(NoSuchMethodException ex){
                     
                 }
@@ -496,13 +504,40 @@ public class TLDGenerator extends AbstractProcessor {
             return mirror;
         }
         
-        public Object getValue(String annotationElement) {
+        public Object getValue(String annotationAttributeName) {
             for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : processingEnv.getElementUtils().getElementValuesWithDefaults(mirror).entrySet()) {
-                if (entry.getKey().getSimpleName().toString().equals(annotationElement)) {
+                if (entry.getKey().getSimpleName().toString().equals(annotationAttributeName)) {
                     return entry.getValue().getValue();
                 }
             }
             return null;
         }
+        
+        public String getValueAsString(String annotationAttributeName) {
+            Object value = getValue(annotationAttributeName);
+            return value != null ? value.toString(): null;
+        }
+        
+        public String getValueAsClassname(String annotationAttributeName){
+            Object o=getValue(annotationAttributeName);
+            return o != null ? o.toString().replace(".class", "") : null;
+        }
+        
+        public List<?> getValueAsList(String annotationAttributeName){
+            return (List<?>) getValue(annotationAttributeName);
+        }
+        
+        public List<AnnotationMirror> getValueAsAnnotationMirrorList(String annotationAttributeName){
+            return (List<AnnotationMirror>) getValue(annotationAttributeName);
+        }
+        
+        public List<String> getValueAsClassnameList(String annotationAttributeName){
+            List<String> classnames=new LinkedList<String>();
+            for(Object o: getValueAsList(annotationAttributeName)){
+                classnames.add(o.toString().replace(".class", ""));
+            }
+            return classnames;
+        }
+        
     }
 }

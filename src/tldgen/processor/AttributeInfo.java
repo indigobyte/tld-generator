@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * TODO missing deferred value and method
  */
-@XmlType(propOrder={"description", "name", "required", "runtimeValueAllowed", "type", "jspFragment", "deferredValue", "deferredMethod"})
+@XmlType(propOrder={"description", "name", "required", "runtimeValueAllowed", "type", "jspFragment", "deferredValue", "deferredMethod", "flag"})
 class AttributeInfo {
     private String name;
     private String description;
@@ -45,7 +45,7 @@ class AttributeInfo {
         this.description = description;
     }
     
-    @XmlElement
+    @XmlElement(defaultValue="false")
     public boolean isRequired() {
         return required;
     }
@@ -95,7 +95,18 @@ class AttributeInfo {
         assert type != null;
         return type.equals("javax.servlet.jsp.tagext.JspFragment");
     }
+    
+    private Boolean flag= Boolean.TRUE;
 
+    @XmlElement
+    public Boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+    
     @Override
     public String toString() {
         return "AttributeInfo{" + "name=" + name + ", required=" + required + ", type=" + type + '}';

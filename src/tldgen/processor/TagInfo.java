@@ -7,6 +7,7 @@ package tldgen.processor;
 
 import java.util.LinkedList;
 import java.util.List;
+import javax.lang.model.element.PackageElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import tldgen.BodyContentType;
@@ -123,5 +124,5 @@ class TagInfo {
     public boolean isDynamicAttributesAccepted() {
         return dynamicAttributesAccepted;
     }
-    
+
 }
