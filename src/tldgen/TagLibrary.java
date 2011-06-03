@@ -10,6 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.servlet.jsp.tagext.JspTag;
+import javax.servlet.jsp.tagext.TagLibraryValidator;
 
 /**
  *
@@ -39,6 +40,10 @@ public @interface TagLibrary {
     TagFile[] tagFiles() default {};
     
     Class<?>[] functionClasses() default {};
+    
+    Class<?>[] webListeners() default {};
+    
+    Class<? extends TagLibraryValidator> validator() default TagLibraryValidator.class;
     
     String descriptorFile() default "taglib.tld";
     
