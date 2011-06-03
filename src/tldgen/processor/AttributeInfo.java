@@ -14,13 +14,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * TODO missing deferred value and method
  */
-@XmlType(propOrder={"description", "name", "required", "runtimeValueAllowed", "type", "jspFragment", "deferredValue", "deferredMethod", "flag"})
+@XmlType(propOrder={"description", "name", "required", "runtimeValueAllowed", "type", "jspFragment", "deferredValue", "deferredMethod"})
 class AttributeInfo {
     private String name;
     private String description;
-    private boolean required;
+    private Boolean required;
     private String type;
-    private boolean runtimeValueAllowed;
+    private Boolean runtimeValueAllowed;
     private DeferredValueInfo deferredValue;
     private DeferredMethodInfo deferredMethod;
 
@@ -46,20 +46,21 @@ class AttributeInfo {
     }
     
     @XmlElement(defaultValue="false")
-    public boolean isRequired() {
+    public Boolean getRequired() {
         return required;
     }
 
-    public void setRequired(boolean required) {
+    public void setRequired(Boolean required) {
         this.required = required;
     }
 
-    @XmlElement(name="rtexprvalue")
-    public boolean isRuntimeValueAllowed() {
+    @XmlElement(name="rtexprvalue", defaultValue="false")
+    public Boolean getRuntimeValueAllowed() {
         return runtimeValueAllowed;
     }
 
-    public void setRuntimeValueAllowed(boolean b) {
+    public void setRuntimeValueAllowed(Boolean b) {
+        System.out.println("runtimeValueAllowed: "+b);
         this.runtimeValueAllowed = b;
     }
 
@@ -90,21 +91,10 @@ class AttributeInfo {
         this.deferredValue = deferredValue;
     }
     
-    @XmlElement(name="fragment")
-    public boolean isJspFragment(){
+    @XmlElement(name="fragment", defaultValue="false")
+    public Boolean isJspFragment(){
         assert type != null;
-        return type.equals("javax.servlet.jsp.tagext.JspFragment");
-    }
-    
-    private Boolean flag= Boolean.TRUE;
-
-    @XmlElement
-    public Boolean isFlag() {
-        return flag;
-    }
-
-    public void setFlag(boolean flag) {
-        this.flag = flag;
+        return type.equals("javax.servlet.jsp.tagext.JspFragment") ? true: null;
     }
     
     @Override

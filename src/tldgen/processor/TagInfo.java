@@ -27,7 +27,7 @@ class TagInfo {
     private String tagClass;
     private String teiClass;
     private BodyContentType bodyContentType;
-    private boolean dynamicAttributesAccepted;
+    private Boolean dynamicAttributesAccepted;
     private List<AttributeInfo> attributes=new LinkedList<AttributeInfo>();
     private List<VariableInfo> variables=new LinkedList<VariableInfo>();
     
@@ -116,12 +116,12 @@ class TagInfo {
         return "TagInfo{" + "name=" + name + ", tagClass=" + tagClass + ", bodyContentType=" + bodyContentType + ", attributes=" + attributes + '}';
     }
 
-    public void setDynamicAttributesAccepted(boolean b) {
+    public void setDynamicAttributesAccepted(Boolean b) {
         this.dynamicAttributesAccepted=b;
     }
 
-    @XmlElement(name="dynamic-attributes")
-    public boolean isDynamicAttributesAccepted() {
+    @XmlElement(name="dynamic-attributes", defaultValue="false")
+    public Boolean getDynamicAttributesAccepted() {
         return dynamicAttributesAccepted;
     }
 

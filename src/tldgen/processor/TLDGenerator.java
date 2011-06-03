@@ -1,9 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen.processor;
 
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
@@ -39,6 +37,7 @@ import javax.tools.StandardLocation;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlElement;
 import tldgen.BodyContentType;
 import tldgen.DeferredMethod;
 import tldgen.DeferredValue;
@@ -133,17 +132,18 @@ public class TLDGenerator extends AbstractProcessor {
                     }
                     if(info.getNameFromAttribute() != null && info.getNameGiven()!= null){
                         processingEnv.getMessager().printMessage(Kind.ERROR, "nameFromAttribute and nameGiven can not be presented at the same time.", e);
+                    }else{
+                        String type = mirrorWrapper.getValueAsClassname("type");
+                        if(!type.equals("java.lang.String")){
+                            info.setVariableClass(type);
+                        }
+                        tagInfo.getVariables().add(info);
                     }
-                    info.setVariableClass(mirrorWrapper.getValueAsClassname("type"));
-                    info.setScope(VariableScope.valueOf(mirrorWrapper.getValueAsString("scope")));
-                    tagInfo.getVariables().add(info);
                 }
 
-                List<ExecutableElement> methodsT = ElementFilter.methodsIn(processingEnv.getElementUtils().getAllMembers(tElement)); 
-                for(ExecutableElement m:methodsT){
+                for(ExecutableElement m:ElementFilter.methodsIn(processingEnv.getElementUtils().getAllMembers(tElement))){
                     if (isSetter(m) && m.getAnnotation(TagAttribute.class) != null) {
-                        TagAttribute tagAttribute = m.getAnnotation(TagAttribute.class);
-                        final AnnotationMirror annotationMirror = getAnnotationMirror(m, TagAttribute.class);
+                        AnnotationMirror annotationMirror = getAnnotationMirror(m, TagAttribute.class);
                         String type = m.getParameters().get(0).asType().toString();
                         if (nativeTypes.containsKey(type)) {
                             type = nativeTypes.get(type);
@@ -154,8 +154,6 @@ public class TLDGenerator extends AbstractProcessor {
                         attributeInfo.setType(type);
                         if (type.equals("javax.servlet.jsp.tagext.JspFragment")) {
                             attributeInfo.setRuntimeValueAllowed(true);
-                        } else {
-                            attributeInfo.setRuntimeValueAllowed(tagAttribute.runtimeValueAllowed());
                         }
                         
                         if(type.equals("javax.el.ValueExpression")){
@@ -181,7 +179,10 @@ public class TLDGenerator extends AbstractProcessor {
                             copyAnnotationValuesToBean(mirrorWrapper.getMirror(), info);
                             info.setNameFromAttribute(attributeInfo.getName());
                             info.setNameGiven(null);
-                            info.setVariableClass(mirrorWrapper.getValueAsClassname("type"));
+                            String classname = mirrorWrapper.getValueAsClassname("type");
+                            if(!classname.equals("java.lang.String")){
+                                info.setVariableClass(classname);
+                            }
                             info.setScope(VariableScope.valueOf(mirrorWrapper.getValueAsString("scope")));
                             tagInfo.getVariables().add(info);
                         }
@@ -205,6 +206,7 @@ public class TLDGenerator extends AbstractProcessor {
                         tElement = (TypeElement) ((DeclaredType) superclass).asElement();
                     }
                 } while( tElement != null );
+                
                 for(TagLibraryWrapper library: libraries){
                     if( library.getTagHandlerClasses().contains(tagInfo.getTagClass()) || 
                         (library.getTagHandlerClasses().isEmpty() && haveSamePackage(library, e) )){
@@ -249,8 +251,9 @@ public class TLDGenerator extends AbstractProcessor {
                     ( library.getValidatorClass() == null && haveSamePackage(library, e) )){
                     if(library.getInfo().getValidator() != null){
                         processingEnv.getMessager().printMessage(Kind.ERROR, "There can be only one validator per tag library.");
+                    }else{
+                        library.getInfo().setValidator(validatorInfo);
                     }
-                    library.getInfo().setValidator(validatorInfo);
                 }
             }
         }
@@ -353,7 +356,54 @@ public class TLDGenerator extends AbstractProcessor {
 
     private <T> void copyAnnotationValuesToBean(AnnotationMirror annotationMirror, T bean) {
         Map<? extends ExecutableElement, ? extends AnnotationValue> annotationValues = processingEnv.getElementUtils().getElementValuesWithDefaults(annotationMirror);
+            try{
+                for(PropertyDescriptor descriptor:Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors()){
+                    if(bean.getClass().equals(VariableInfo.class)){
+                        System.out.println("property: "+descriptor.getShortDescription());
+                        System.out.println("type: "+descriptor.getPropertyType());
+                        System.out.println("read: "+descriptor.getReadMethod());
+                        System.out.println("write: "+descriptor.getWriteMethod());
+                    }
+                    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationValues.entrySet()) {
+                        if(entry.getKey().getSimpleName().contentEquals(descriptor.getName())){
+                            XmlElement annotation = descriptor.getReadMethod().getAnnotation(XmlElement.class);
+                            Object value=entry.getValue().getValue();
+                            if(descriptor.getPropertyType().isEnum()){
+                                for(Object enumConstant:descriptor.getPropertyType().getEnumConstants()){
+                                    if(enumConstant.toString().equals(entry.getValue().getValue().toString())){
+                                        value=enumConstant;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(bean.getClass().equals(VariableInfo.class)){
+                                System.out.println("annotation Value: "+value);
+                                System.out.println("class: "+value.getClass());
+                                if(annotation != null){
+                                    System.out.println("default value: "+annotation.defaultValue());
+                                }
+                            }
+                            if(annotation == null || !annotation.defaultValue().equals(value.toString())){
+                                if(!value.equals("") && descriptor.getWriteMethod() != null){
+                                    if(!value.getClass().equals(descriptor.getPropertyType())){
+                                        System.out.println("mismatch: "+descriptor.getName());
+                                    }else{
+                                        descriptor.getWriteMethod().invoke(bean, value);
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationValues.entrySet()) {
+            if(true){
+                break;
+            }
             try {
                 String returnType = entry.getKey().getReturnType().toString();
                 Class type;
@@ -377,6 +427,7 @@ public class TLDGenerator extends AbstractProcessor {
                     type=entry.getValue().getValue().getClass();
                 }
                 String name = entry.getKey().getSimpleName().toString();
+                
                 name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
                 Method setter = null;
                 try{

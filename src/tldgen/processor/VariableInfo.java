@@ -18,15 +18,15 @@ public class VariableInfo {
     private String nameGiven;
     private String nameFromAttribute;
     private String variableClass;
-    private boolean declare;
+    private Boolean declare;
     private VariableScope scope;
 
-    @XmlElement
-    public boolean isDeclare() {
+    @XmlElement(defaultValue="true")
+    public Boolean getDeclare() {
         return declare;
     }
 
-    public void setDeclare(boolean declare) {
+    public void setDeclare(Boolean declare) {
         this.declare = declare;
     }
 
@@ -57,6 +57,7 @@ public class VariableInfo {
         this.nameGiven = nameGiven;
     }
 
+    @XmlElement(defaultValue="NESTED")
     public VariableScope getScope() {
         return scope;
     }
@@ -65,7 +66,7 @@ public class VariableInfo {
         this.scope = scope;
     }
 
-    @XmlElement(name="variable-class")
+    @XmlElement(name="variable-class", defaultValue="java.lang.String")
     public String getVariableClass() {
         return variableClass;
     }
