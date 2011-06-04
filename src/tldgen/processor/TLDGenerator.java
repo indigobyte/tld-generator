@@ -154,6 +154,9 @@ public class TLDGenerator extends AbstractProcessor {
                         attributeInfo.setType(type);
                         if (type.equals("javax.servlet.jsp.tagext.JspFragment")) {
                             attributeInfo.setRuntimeValueAllowed(true);
+                            attributeInfo.setJspFragment(true);
+                        }else{
+                            attributeInfo.setJspFragment(false);
                         }
                         
                         if(type.equals("javax.el.ValueExpression")){
@@ -180,9 +183,7 @@ public class TLDGenerator extends AbstractProcessor {
                             info.setNameFromAttribute(attributeInfo.getName());
                             info.setNameGiven(null);
                             String classname = mirrorWrapper.getValueAsClassname("type");
-                            if(!classname.equals("java.lang.String")){
                                 info.setVariableClass(classname);
-                            }
                             info.setScope(VariableScope.valueOf(mirrorWrapper.getValueAsString("scope")));
                             tagInfo.getVariables().add(info);
                         }
@@ -360,7 +361,6 @@ public class TLDGenerator extends AbstractProcessor {
                 for(PropertyDescriptor descriptor:Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors()){
                     for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationValues.entrySet()) {
                         if(entry.getKey().getSimpleName().contentEquals(descriptor.getName())){
-                            XmlElement annotation = descriptor.getReadMethod().getAnnotation(XmlElement.class);
                             Object value=entry.getValue().getValue();
                             if(descriptor.getPropertyType().isEnum()){
                                 for(Object enumConstant:descriptor.getPropertyType().getEnumConstants()){
@@ -370,12 +370,8 @@ public class TLDGenerator extends AbstractProcessor {
                                     }
                                 }
                             }
-                            if(annotation == null || !annotation.defaultValue().equals(value.toString())){
-                                if(!value.equals("") && descriptor.getWriteMethod() != null){
-                                    if(value.getClass().equals(descriptor.getPropertyType())){
-                                        descriptor.getWriteMethod().invoke(bean, value);
-                                    }
-                                }
+                            if(!value.equals("") && descriptor.getWriteMethod() != null && value.getClass().equals(descriptor.getPropertyType()) ){
+                                descriptor.getWriteMethod().invoke(bean, value);
                             }
                             break;
                         }
@@ -433,9 +429,12 @@ public class TLDGenerator extends AbstractProcessor {
         FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/" + descriptorFile, new Element[0]);
         JAXBContext context = JAXBContext.newInstance(TagLibraryInfo.class);
         Marshaller m = context.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        m.setProperty(Marshaller.JAXB_FRAGMENT, true);
         m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd");
         Writer writer = file.openWriter();
+        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+        m.setListener(new DefaultValueCleaner());
         m.marshal(libraryInfo, writer);
         writer.close();
     }

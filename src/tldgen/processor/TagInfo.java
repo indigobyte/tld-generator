@@ -20,7 +20,7 @@ class TagInfo {
     private String tagClass;
     private String teiClass;
     private BodyContentType bodyContentType;
-    private Boolean dynamicAttributesAccepted;
+    private Boolean dynamicAttributesAccepted= false;
     private List<AttributeInfo> attributes=new LinkedList<AttributeInfo>();
     private List<VariableInfo> variables=new LinkedList<VariableInfo>();
     

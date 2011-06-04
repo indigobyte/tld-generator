@@ -15,6 +15,7 @@ class AttributeInfo {
     private Boolean required;
     private String type;
     private Boolean runtimeValueAllowed;
+    private Boolean jspFragment;
     private DeferredValueInfo deferredValue;
     private DeferredMethodInfo deferredMethod;
 
@@ -85,9 +86,12 @@ class AttributeInfo {
     }
     
     @XmlElement(name="fragment", defaultValue="false")
-    public Boolean isJspFragment(){
-        assert type != null;
-        return type.equals("javax.servlet.jsp.tagext.JspFragment") ? true: null;
+    public Boolean getJspFragment(){
+        return jspFragment;
+    }
+    
+    public void setJspFragment(Boolean b){
+        this.jspFragment=b;
     }
     
     @Override
