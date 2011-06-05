@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen;
 
 import java.lang.annotation.ElementType;
@@ -10,13 +6,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
- * @author Victor
+ * Indicates that an attribute is of type javax.el.MethodExpression. 
+ * 
+ * @author Victor Hugo Herrera Maldonado
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface DeferredMethod {
     
+    /**
+     * Signature of the method.
+     */
     String value() default "void methodName()";
     
 }

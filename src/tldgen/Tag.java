@@ -1,11 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package tldgen;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,30 +11,48 @@ import javax.servlet.jsp.tagext.TagExtraInfo;
  * 
  * @author Victor Hugo Herrera Maldonado
  */
-//@Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface Tag {
     
     /**
      * Name of the tag
-     * 
-     * return tag name.
      */
     String value() default "";
-    
+
+    /**
+     * Description of the tag.
+     */
     String description() default "";
     
+    /**
+     * Display name that could be used by a tool at design time.
+     */
     String displayName() default "";
     
+    /**
+     * Icon that could be used by a tool at design time.
+     */
     String icon() default "";
     
+    /**
+     * Example of use of this tag.
+     */
     String example() default "";
     
+    /**
+     * The type of content for the body of the tag.
+     */
     BodyContentType bodyContentType() default BodyContentType.EMPTY;
     
+    /**
+     * A class with extra information for the tag handler.
+     */
     Class<? extends TagExtraInfo> teiClass() default TagExtraInfo.class;
     
+    /**
+     * Scripting variables for the tag handler.
+     */
     Variable[] variables() default {};
     
 }

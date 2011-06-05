@@ -9,13 +9,13 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  * 
  */
 @XmlRootElement(name="taglib")
 @XmlType(propOrder={"description", "displayName", "icon", "libraryVersion", "shortName", 
             "uri", "validator", "webListeners", "tagFiles", "tagHandlers", "functions"})
-public class TagLibraryInfo {
+class TagLibraryInfo {
     private String uri;
     private String description;
     private String displayName;

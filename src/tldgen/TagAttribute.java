@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package tldgen;
 
 import java.lang.annotation.ElementType;
@@ -15,20 +10,25 @@ import java.lang.annotation.Target;
  *
  * @author Victor Hugo Herrera Maldonado
  */
-//@Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface TagAttribute {
     
     /**
-     * Indicates if the attributes is required.
+     * Indicates if the attribute is required.
      * 
-     * @return true if the attribute is required.
      */
     boolean required() default false;
     
+    /**
+     * Description of the attribute.
+     * 
+     */
     String description() default "";
     
+    /**
+     * Defines if the attribute can have a value calculated at runtime.
+     */
     boolean runtimeValueAllowed() default false;
 
 }

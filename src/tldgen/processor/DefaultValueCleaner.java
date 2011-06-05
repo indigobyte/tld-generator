@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen.processor;
 
 import java.beans.IntrospectionException;
@@ -13,9 +9,9 @@ import javax.xml.bind.annotation.XmlElement;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  */
-public class DefaultValueCleaner extends Marshaller.Listener{
+class DefaultValueCleaner extends Marshaller.Listener{
 
     @Override
     public void beforeMarshal(Object source) {

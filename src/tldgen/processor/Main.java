@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen.processor;
 
 import javax.xml.bind.JAXBContext;
@@ -11,9 +7,9 @@ import tldgen.BodyContentType;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  */
-public class Main {
+class Main {
     
     public static void main(String[] args) throws JAXBException {
         TagLibraryInfo info=new TagLibraryInfo("http://simplehtml.net");

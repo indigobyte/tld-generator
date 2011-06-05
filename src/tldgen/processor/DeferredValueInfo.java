@@ -1,17 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen.processor;
 
 import javax.xml.bind.annotation.XmlType;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  */
 @XmlType
-public class DeferredValueInfo {
+class DeferredValueInfo {
     private String type;
 
     public String getType() {

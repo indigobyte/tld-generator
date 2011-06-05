@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen.processor;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -10,10 +6,10 @@ import tldgen.VariableScope;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  */
 @XmlType(propOrder={"description", "nameGiven", "nameFromAttribute", "variableClass", "declare", "scope"})
-public class VariableInfo {
+class VariableInfo {
     private String description;
     private String nameGiven;
     private String nameFromAttribute;

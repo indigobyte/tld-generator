@@ -1,11 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package tldgen;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,24 +10,33 @@ import java.lang.annotation.Target;
  *  
  * @author Victor Hugo Herrera Maldonado
  */
-//@Documented
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface Function {
     
     /**
      * Name of the function.
-     * 
-     * @return function name.
      */
     String value() default "";
     
+    /**
+     * Description of the function.
+     */
     String description() default "";
     
+    /**
+     * Display name that could be used by a tool at design time.
+     */
     String displayName() default "";
     
+    /**
+     * Icon that could be used by a tool at design time.
+     */
     String icon() default "";
     
+    /**
+     * Example of use of this function.
+     */
     String example() default "";
     
 }

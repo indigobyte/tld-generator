@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen.processor;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -9,10 +5,10 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  */
 @XmlType
-public class DeferredMethodInfo {
+class DeferredMethodInfo {
     private String signature;
 
     public String getSignature() {

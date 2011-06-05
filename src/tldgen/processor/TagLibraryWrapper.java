@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tldgen.processor;
 
 import java.util.LinkedList;
@@ -10,9 +6,9 @@ import javax.lang.model.element.PackageElement;
 
 /**
  *
- * @author Victor
+ * @author Victor Hugo Herrera Maldonado
  */
-public class TagLibraryWrapper {
+class TagLibraryWrapper {
     private PackageElement packageElement;
     private TagLibraryInfo tagLibraryInfo;
     private List<String> tagHandlersClasses=new LinkedList<String>();
