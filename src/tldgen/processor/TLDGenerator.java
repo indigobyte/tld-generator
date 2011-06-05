@@ -37,7 +37,6 @@ import javax.tools.StandardLocation;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.XmlElement;
 import tldgen.BodyContentType;
 import tldgen.DeferredMethod;
 import tldgen.DeferredValue;
@@ -258,16 +257,21 @@ public class TLDGenerator extends AbstractProcessor {
                 }
             }
         }
-        
-        for(Element e: roundEnv.getElementsAnnotatedWith(WebListener.class)){
-            WebListenerInfo webListenerInfo=new WebListenerInfo(e.asType().toString());
-            for(TagLibraryWrapper library: libraries){
-                if( library.getWebListenerClasses().contains(webListenerInfo.getListenerClass()) || 
-                        (library.getWebListenerClasses().isEmpty() && haveSamePackage(library, e)) ){
-                    library.getInfo().getWebListeners().add(webListenerInfo);
+        try {
+            Class<?> webListenerAnnotationType = Class.forName("javax.servlet.annotation.WebListener");
+            for(Element e: roundEnv.getElementsAnnotatedWith((Class<WebListener>)webListenerAnnotationType)){
+                WebListenerInfo webListenerInfo=new WebListenerInfo(e.asType().toString());
+                for(TagLibraryWrapper library: libraries){
+                    if( library.getWebListenerClasses().contains(webListenerInfo.getListenerClass()) || 
+                            (library.getWebListenerClasses().isEmpty() && haveSamePackage(library, e)) ){
+                        library.getInfo().getWebListeners().add(webListenerInfo);
+                    }
                 }
             }
+        } catch (ClassNotFoundException ex) {
+            
         }
+        
         
         if (!roundEnv.processingOver()) {
             try {
