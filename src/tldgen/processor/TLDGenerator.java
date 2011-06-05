@@ -1,10 +1,12 @@
 package tldgen.processor;
 
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -50,11 +52,12 @@ import tldgen.Variable;
 import tldgen.VariableScope;
 
 /**
- * TLD Generator.
+ * Annotation proccesor for the generation of tag library descriptors. This annotation processor is registered 
+ * as a service so it's automatically invoked at compilation stage.
  * 
  * @author Victor Hugo Herrera Maldonado
  */
-@SupportedAnnotationTypes("tldgen.*")
+@SupportedAnnotationTypes({"tldgen.*", "javax.servlet.annotation.WebListener"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class TLDGenerator extends AbstractProcessor {
     private List<TagLibraryWrapper> libraries=new LinkedList<TagLibraryWrapper>();
@@ -110,7 +113,7 @@ public class TLDGenerator extends AbstractProcessor {
                     }
                 }
                 VariableElement value = (VariableElement) tagMirrorWrapper.getValue("bodyContentType");
-                TagInfo tagInfo = new TagInfo(toAttributeName(tagName), e.asType().toString(), BodyContentType.valueOf(value.toString()));
+                TagInfo tagInfo = new TagInfo(Introspector.decapitalize(tagName), e.asType().toString(), BodyContentType.valueOf(value.toString()));
                 copyAnnotationValuesToBean(tagMirrorWrapper.getMirror(), tagInfo);
                 
                 if(!tagMirrorWrapper.getValueAsClassname("teiClass").equals("javax.servlet.jsp.tagext.TagExtraInfo")){
@@ -296,17 +299,9 @@ public class TLDGenerator extends AbstractProcessor {
     private String getAttributeName(ExecutableElement element) {
         Matcher matcher = pattern.matcher(element.getSimpleName().toString());
         matcher.matches();
-        return toAttributeName(matcher.group(1));
+        return Introspector.decapitalize(matcher.group(1));
     }
 
-    private static String toAttributeName(String name) {
-        if (name.length() == 1) {
-            return name.toLowerCase();
-        } else {
-            return Character.toLowerCase(name.charAt(0)) + name.substring(1);
-        }
-    }
-    
     private String getSignature(ExecutableElement e) {
         StringBuilder builder = new StringBuilder(e.getReturnType().toString());
         builder.append(" ");
@@ -352,9 +347,11 @@ public class TLDGenerator extends AbstractProcessor {
                     setter.invoke(bean, value);
                 }
             } catch (NoSuchMethodException ex) {
-                
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                //do nothing
+            } catch (IllegalAccessException ex) {
+                //do nothing
+            } catch (InvocationTargetException ex) {
+                //do nothing
             }
         }
     }
@@ -381,52 +378,13 @@ public class TLDGenerator extends AbstractProcessor {
                         }
                     }
                 }
-            }catch(Exception ex){
-                ex.printStackTrace();
+            } catch(IllegalAccessException ex){
+                //do nothing
+            } catch(InvocationTargetException ex){
+                //do nothing
+            } catch(IntrospectionException ex){
+                //do nothing
             }
-        
-        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationValues.entrySet()) {
-            if(true){
-                break;
-            }
-            try {
-                String returnType = entry.getKey().getReturnType().toString();
-                Class type;
-                if(returnType.equals("boolean")){
-                    type=boolean.class;
-                }else if(returnType.equals("byte")){
-                    type=byte.class;
-                }else if(returnType.equals("short")){
-                    type=short.class;
-                }else if(returnType.equals("int")){
-                    type=int.class;
-                }else if(returnType.equals("long")){
-                    type=long.class;
-                }else if(returnType.equals("float")){
-                    type=float.class;
-                }else if(returnType.equals("double")){
-                    type=double.class;
-                }else if(returnType.equals("char")){
-                    type=char.class;
-                }else{
-                    type=entry.getValue().getValue().getClass();
-                }
-                String name = entry.getKey().getSimpleName().toString();
-                
-                name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-                Method setter = null;
-                try{
-                    setter=bean.getClass().getMethod("set" + name, type);
-                }catch(NoSuchMethodException ex){
-                    
-                }
-                if (setter != null && !entry.getValue().getValue().equals("")) {
-                    setter.invoke(bean, entry.getValue().getValue());
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
     }
     
     private void generateXML(TagLibraryInfo libraryInfo, String descriptorFile) throws JAXBException, IOException {
