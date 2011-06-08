@@ -59,8 +59,8 @@ import tldgen.VariableScope;
  */
 @SupportedAnnotationTypes({"tldgen.*", "javax.servlet.annotation.WebListener"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-public class TLDGenerator extends AbstractProcessor {
-    private List<TagLibraryWrapper> libraries=new LinkedList<TagLibraryWrapper>();
+public final class TLDGenerator extends AbstractProcessor {
+    private HashMap<String, TagLibraryWrapper> librariesMap=new HashMap<String, TagLibraryWrapper>();
     
     private static Map<String, String> nativeTypes = new HashMap<String, String>();
     {
@@ -74,8 +74,15 @@ public class TLDGenerator extends AbstractProcessor {
         nativeTypes.put("char", "java.lang.Character");
     }
 
+    /**
+     * Process the annotated elements to generate the TLD files.
+     * 
+     * @param annotations
+     * @param roundEnv
+     * @return true
+     */
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    public final boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element e : roundEnv.getElementsAnnotatedWith(TagLibrary.class)) {
             AnnotationMirrorWrapper wrapper=getAnnotationMirrorWrapper(e, TagLibrary.class);
             PackageElement libraryPackage = processingEnv.getElementUtils().getPackageOf(e);
@@ -96,7 +103,11 @@ public class TLDGenerator extends AbstractProcessor {
                 copyAnnotationValuesToBean(mirror, tagFileInfo);
                 libraryInfo.getTagFiles().add(tagFileInfo);
             }
-            libraries.add(library);
+            if(librariesMap.containsKey(library.getDescriptorFile())){
+               processingEnv.getMessager().printMessage(Kind.ERROR, 
+                       "At least two libraries ("+librariesMap.get(library.getDescriptorFile()).getInfo().getUri()+" and "+library.getInfo().getUri()+") have the same descriptor file: "+library.getDescriptorFile(), e); 
+            }
+            librariesMap.put(library.getDescriptorFile(), library);
         }
         
         for (Element e : roundEnv.getElementsAnnotatedWith(Tag.class)) {
@@ -166,6 +177,8 @@ public class TLDGenerator extends AbstractProcessor {
                             AnnotationMirrorWrapper mirrorWrapper=getAnnotationMirrorWrapper(m, DeferredValue.class);
                             if(mirrorWrapper != null){
                                 info.setType(mirrorWrapper.getValueAsClassname("value"));
+                            }else{
+                                info.setType(Object.class.getName());
                             }
                             attributeInfo.setDeferredValue(info);
                         }else if(type.equals("javax.el.MethodExpression")){
@@ -174,6 +187,8 @@ public class TLDGenerator extends AbstractProcessor {
                             AnnotationMirrorWrapper mirrorWrapper=getAnnotationMirrorWrapper(m, DeferredMethod.class);
                             if(mirrorWrapper != null){
                                 info.setSignature(mirrorWrapper.getValueAsClassname("value"));
+                            }else{
+                                info.setSignature("void methodName()");
                             }
                             attributeInfo.setDeferredMethod(info);
                         }
@@ -210,7 +225,7 @@ public class TLDGenerator extends AbstractProcessor {
                     }
                 } while( tElement != null );
                 
-                for(TagLibraryWrapper library: libraries){
+                for(TagLibraryWrapper library: librariesMap.values()){
                     if( library.getTagHandlerClasses().contains(tagInfo.getTagClass()) || 
                         (library.getTagHandlerClasses().isEmpty() && haveSamePackage(library, e) )){
                         library.getInfo().getTagHandlers().add(tagInfo);
@@ -229,7 +244,7 @@ public class TLDGenerator extends AbstractProcessor {
                 }
                 FunctionInfo info = new FunctionInfo(functionName, e.getEnclosingElement().asType().toString(), getSignature((ExecutableElement)e));
                 copyAnnotationValuesToBean(functionMirrorWrapper.getMirror(), info);
-                for(TagLibraryWrapper library: libraries){
+                for(TagLibraryWrapper library: librariesMap.values()){
                     if( library.getFunctionClasses().contains(info.getFunctionClass()) || 
                         (library.getFunctionClasses().isEmpty() && haveSamePackage(library, e) )){
                         library.getInfo().getFunctions().add(info);
@@ -249,7 +264,7 @@ public class TLDGenerator extends AbstractProcessor {
                 copyAnnotationValuesToBean(param, paramInfo);
                 validatorInfo.getParameters().add(paramInfo);
             }
-            for(TagLibraryWrapper library: libraries){
+            for(TagLibraryWrapper library: librariesMap.values()){
                 if( (library.getValidatorClass() != null && library.getValidatorClass().equals(validatorInfo.getValidatorClass()))||
                     ( library.getValidatorClass() == null && haveSamePackage(library, e) )){
                     if(library.getInfo().getValidator() != null){
@@ -264,7 +279,7 @@ public class TLDGenerator extends AbstractProcessor {
             Class<?> webListenerAnnotationType = Class.forName("javax.servlet.annotation.WebListener");
             for(Element e: roundEnv.getElementsAnnotatedWith((Class<WebListener>)webListenerAnnotationType)){
                 WebListenerInfo webListenerInfo=new WebListenerInfo(e.asType().toString());
-                for(TagLibraryWrapper library: libraries){
+                for(TagLibraryWrapper library: librariesMap.values()){
                     if( library.getWebListenerClasses().contains(webListenerInfo.getListenerClass()) || 
                             (library.getWebListenerClasses().isEmpty() && haveSamePackage(library, e)) ){
                         library.getInfo().getWebListeners().add(webListenerInfo);
@@ -278,7 +293,7 @@ public class TLDGenerator extends AbstractProcessor {
         
         if (!roundEnv.processingOver()) {
             try {
-                for (TagLibraryWrapper library: libraries) {
+                for (TagLibraryWrapper library: librariesMap.values()) {
                     generateXML(library.getInfo(), library.getDescriptorFile());
                 }
             } catch (JAXBException ex) {

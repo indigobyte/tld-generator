@@ -1,7 +1,6 @@
 /**
- * Internal package with the implementation of the annotation processor.
+ * Internal package for generation of TLDs.
  */
-
 @XmlSchema(
     namespace = "http://java.sun.com/xml/ns/javaee",
     elementFormDefault = XmlNsForm.QUALIFIED) 

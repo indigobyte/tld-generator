@@ -6,7 +6,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that a method is a function. If the method is not public static, the declaration will be omitted by the TLD generator.
+ * Defines a public static method as an EL function. If the method is not public static, the function is not considered in the descriptor.
+ * 
+ * <p>
+ * <b>Example:</b> Basic function.
+ * <pre>
+ * public class MyFunctions {
+ *     
+ *     &#64;Function
+ *     public static String reverse(String string){
+ *         return new StringBuilder(string).reverse().toString();
+ *     }
+ *     
+ * }
+ * </pre>
+ * </p>
  *  
  * @author Victor Hugo Herrera Maldonado
  */
@@ -15,7 +29,7 @@ import java.lang.annotation.Target;
 public @interface Function {
     
     /**
-     * Name of the function.
+     * Name of the function. If not specified, the name will be the name of the method.
      */
     String value() default "";
     

@@ -1,7 +1,7 @@
 package tldgen;
 
 /**
- * Enumeration for the scopes of a scripting variaable.
+ * Possible scopes for a scripting variable. Used in {@link Variable} annotation.
  * 
  * @author Victor Hugo Herrera Maldonado
  */

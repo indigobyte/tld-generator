@@ -5,7 +5,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for the definition of a tag file.
+ * Annotation for the definition of a tag file. Because tag files are not implemented in classes, 
+ * they can't be directly annotated and have to be declared in the tag library.
+ * <p>
+ * <b>Example:</b> A tag library definition with tag files.
+ * <pre>
+ * &#64;TagLibrary(value="http://example-guide.org", 
+ *           tagFiles={&#64;TagFile(name="greeting", path="META-INF/tags/greeting.tag"), &#64;TagFile(name="header", path="META-INF/tags/header.tag")})
+ * </pre>
+ * <p>
  * 
  * @author Victor Hugo Herrera Maldonado
  */

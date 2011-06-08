@@ -4,20 +4,20 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 
 /**
- * The type of content for the body of tag.
+ * The type of valid content for the body of a tag. Used in {@link Tag} annotation.
  * 
  * @author Victor Hugo Herrera Maldonado
  */
 @XmlEnum
 public enum BodyContentType {
     /**
-     * Any kind of valid JSP content.
+     * The body of the tag can be any kind of valid JSP content.
      */
     @XmlEnumValue("JSP")
     JSP,
     
     /**
-     * No scripts allowed.
+     * The body of the tag doesn't allow scripts.
      */
     @XmlEnumValue("scriptless")
     SCRIPTLESS,
@@ -29,7 +29,7 @@ public enum BodyContentType {
     EMPTY,
     
     /**
-     * The content is dependent on the tag.
+     * The body content is dependent on the tag (Could be in another language like SQL for example). 
      */
     @XmlEnumValue("tagdependent")
     TAG_DEPENDENT;

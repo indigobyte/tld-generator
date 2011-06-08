@@ -6,6 +6,9 @@ import java.lang.annotation.Target;
 
 /**
  * Defines a init parameter for a tag library validator.
+ * <p>
+ * For an example, see @{@link Validator}.
+ * </p>
  * 
  * @author Victor Hugo Herrera Maldonado
  */

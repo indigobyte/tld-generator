@@ -7,16 +7,77 @@ import java.lang.annotation.Target;
 import javax.servlet.jsp.tagext.TagExtraInfo;
 
 /**
- * Indicates that a class is a tag handler.
+ * Class-level definition for a tag handler.
+ * <p>
+ * The tag handler may define tag attributes setters that must be annotated with <code>TagAttribute</code>.
+ * </p>
+ * <p>
+ * <b>Example 1:</b> A simple tag.
+ * <pre>
+ *  package example;
+ *
+ * //import statements
+ *
+ *
+ * &#64;Tag
+ * public class HelloTag extends SimpleTagSupport{
+ *     private String name;
+ *
+ *     &#64;TagAttribute(required=true)
+ *     public void setName(String name) {
+ *         this.name = name;
+ *     }
+ *     
+ *     &#64;Override
+ *     public void doTag() throws JspException, IOException {
+ *         getJspContext().getOut().print("Hello, "+name+"!");
+ *     }
+ *     
+ * }
+ * </pre>
+ * 
+ * <p>
+ * <b>Example 2:</b> Defines a body for the tag.
+ * <pre>
+ * &#64;Tag(bodyContentType=BodyContentType.SCRIPTLESS)
+ * public class ExampleTag extends SimpleTagSupport{
+ *
+ *     &#64;Override
+ *     public void doTag() throws JspException, IOException {
+ *         super.doTag();
+ *     }
+ *     
+ * }
+ * </pre>
  * 
  * @author Victor Hugo Herrera Maldonado
+ * @since 1.0
+ * @see TagAttribute
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface Tag {
     
     /**
-     * Name of the tag
+     * Name of the tag. If this value is not specified, the name of the tag will be the decapitalized simple name of the annotated class without the suffix "Tag" if any.
+     * 
+     * <p>
+     * <b>Example 1:</b> Tag handler with explicit name
+     * <pre>
+     * &#64;Tag("myHello")
+     * public class HelloTag extends SimpleTagSupport{
+     *
+     * }
+     * </pre>
+     * 
+     * <p>
+     * <b>Example 2:</b> The implicit name of tag will be "hello".
+     * <pre>
+     * &#64;Tag
+     * public class HelloTag extends SimpleTagSupport{
+     *
+     * }
+     * </pre>
      */
     String value() default "";
 

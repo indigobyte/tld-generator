@@ -8,6 +8,21 @@ import java.lang.annotation.Target;
 /**
  * Defines a tag library validator.
  * 
+ * <p>
+ * <b>Example: A tag library validator.</b>
+ * <pre>
+ * &#64;Validator(initParams={&#64;InitParam(name="admin.email", value="admin@server.org")})
+ * public class MyTagLibraryValidator extends TagLibraryValidator{
+ *
+ *     &#64;Override
+ *     public ValidationMessage[] validate(String prefix, String uri, PageData page) {
+ *         return super.validate(prefix, uri, page);
+ *     }
+ *     
+ * }
+ * </pre>
+ * </p>
+ * 
  * @author Victor Hugo Herrera Maldonado
  */
 @Target(ElementType.TYPE)

@@ -6,7 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotated a setter method as a tag attribute. The annotated method must follow the conventions for a bean property setter.
+ * Annotates a setter method to be defined as a tag attribute. The annotated method must follow the conventions for a bean property setter.
+ * <p>
+ * See @{@link Tag} for an example.
+ * </p>
  *
  * @author Victor Hugo Herrera Maldonado
  */
