@@ -112,7 +112,7 @@ public final class TLDGenerator extends AbstractProcessor {
         }
         
         for (Element e : roundEnv.getElementsAnnotatedWith(Tag.class)) {
-            if (e instanceof TypeElement) {
+            if (e instanceof TypeElement && !e.getModifiers().contains(Modifier.ABSTRACT)) {
                 TypeElement tElement = (TypeElement)e;
                 AnnotationMirrorWrapper tagMirrorWrapper=getAnnotationMirrorWrapper(e, Tag.class);
                 String tagName = null;
@@ -292,7 +292,7 @@ public final class TLDGenerator extends AbstractProcessor {
         }
         
         
-        if (!roundEnv.processingOver()) {
+        if (roundEnv.processingOver()) {
             try {
                 for (TagLibraryWrapper library: librariesMap.values()) {
                     generateXML(library.getInfo(), library.getDescriptorFile());
