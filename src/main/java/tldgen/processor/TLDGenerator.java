@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
  * @author Victor Hugo Herrera Maldonado
  */
 @SupportedAnnotationTypes( {"tldgen.*", "javax.servlet.annotation.WebListener"})
-@SupportedSourceVersion(SourceVersion.RELEASE_6)
+@SupportedSourceVersion(SourceVersion.RELEASE_15)
 public final class TLDGenerator extends AbstractProcessor {
     private static Map<String, String> nativeTypes = new HashMap<String, String>();
     private HashMap<String, TagLibraryWrapper> librariesMap = new HashMap<String, TagLibraryWrapper>();
