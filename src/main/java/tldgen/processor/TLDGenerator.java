@@ -2,7 +2,6 @@
 package tldgen.processor;
 
 import tldgen.*;
-import tldgen.jaxbworkaround.JaxbForkJoinWorkerThreadFactory;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -31,7 +30,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -391,6 +389,7 @@ public final class TLDGenerator extends AbstractProcessor {
         AtomicReference<IOException> ioException = new AtomicReference<>();
         AtomicReference<JAXBException> jaxbException = new AtomicReference<>();
         CompletableFuture.runAsync(() -> {
+            Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader()); // Workaround for class loader
             try {
                 FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/" + descriptorFile, new Element[0]);
 
@@ -410,19 +409,13 @@ public final class TLDGenerator extends AbstractProcessor {
                 jaxbException.set(e);
             }
             // now you have the right ClassLoader here
-        }, getJaxbExecutor()).join();
+        }).join();
         if (ioException.get() != null) {
             throw ioException.get();
         }
         if (jaxbException.get() != null) {
             throw jaxbException.get();
         }
-    }
-
-    private ForkJoinPool getJaxbExecutor() {
-        JaxbForkJoinWorkerThreadFactory threadFactory = new JaxbForkJoinWorkerThreadFactory();
-        int parallelism = Math.min(0x7fff /* copied from ForkJoinPool.java */, Runtime.getRuntime().availableProcessors());
-        return new ForkJoinPool(parallelism, threadFactory, null, false);
     }
 
     private class AnnotationMirrorWrapper {
