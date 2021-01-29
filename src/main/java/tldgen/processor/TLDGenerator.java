@@ -40,6 +40,7 @@ import javax.tools.StandardLocation;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
 import tldgen.BodyContentType;
 import tldgen.DeferredMethod;
 import tldgen.DeferredValue;
@@ -405,6 +406,7 @@ public final class TLDGenerator extends AbstractProcessor {
     
     private void generateXML(TagLibraryInfo libraryInfo, String descriptorFile) throws JAXBException, IOException {
         FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/" + descriptorFile, new Element[0]);
+
         JAXBContext context = JAXBContext.newInstance(TagLibraryInfo.class);
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
