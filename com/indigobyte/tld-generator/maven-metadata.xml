@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.indigobyte</groupId>
+  <artifactId>tld-generator</artifactId>
+  <versioning>
+    <latest>1.1.CUSTOM</latest>
+    <release>1.1.CUSTOM</release>
+    <versions>
+      <version>1.1.CUSTOM</version>
+    </versions>
+    <lastUpdated>20210129150859</lastUpdated>
+  </versioning>
+</metadata>
