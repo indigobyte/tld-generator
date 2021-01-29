@@ -25,12 +25,52 @@
         <maven.install.plugin.version>2.5.2</maven.install.plugin.version>
         <copy.rename.maven.plugin.version>1.0.1</copy.rename.maven.plugin.version>
         <jaxb.version>2.3.0</jaxb.version>
+
+        <javax.activation.version>1.2.0</javax.activation.version>
+
+        <jaxb.api.version>2.3.0</jaxb.api.version>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+            <version>${javax.activation.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
+            <version>${jaxb.api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>${jaxb.api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.api.version}</version>
+        </dependency>
+
+        <!--
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
             <version>${jaxb.version}</version>
         </dependency>
         <dependency>
@@ -38,11 +78,7 @@
             <artifactId>jaxb-core</artifactId>
             <version>${jaxb.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb.version}</version>
-        </dependency>
+         -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -106,8 +142,11 @@
                                     <goal>rename</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml</sourceFile>
-                                    <destinationFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml</destinationFile>
+                                    <sourceFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml
+                                    </sourceFile>
+                                    <destinationFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml
+                                    </destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -117,8 +156,11 @@
                                     <goal>rename</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml.md5</sourceFile>
-                                    <destinationFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml.md5</destinationFile>
+                                    <sourceFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml.md5
+                                    </sourceFile>
+                                    <destinationFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml.md5
+                                    </destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -128,8 +170,12 @@
                                     <goal>rename</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml.sha1</sourceFile>
-                                    <destinationFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml.sha1</destinationFile>
+                                    <sourceFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml.sha1
+                                    </sourceFile>
+                                    <destinationFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml.sha1
+                                    </destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -139,8 +185,12 @@
                                     <goal>rename</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml</sourceFile>
-                                    <destinationFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml</destinationFile>
+                                    <sourceFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml
+                                    </sourceFile>
+                                    <destinationFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml
+                                    </destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -150,8 +200,12 @@
                                     <goal>rename</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml.md5</sourceFile>
-                                    <destinationFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml.md5</destinationFile>
+                                    <sourceFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml.md5
+                                    </sourceFile>
+                                    <destinationFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml.md5
+                                    </destinationFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -161,8 +215,12 @@
                                     <goal>rename</goal>
                                 </goals>
                                 <configuration>
-                                    <sourceFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml.sha1</sourceFile>
-                                    <destinationFile>${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml.sha1</destinationFile>
+                                    <sourceFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata-local.xml.sha1
+                                    </sourceFile>
+                                    <destinationFile>
+                                        ${mvnRepo}/com/indigobyte/${project.artifactId}/maven-metadata.xml.sha1
+                                    </destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
