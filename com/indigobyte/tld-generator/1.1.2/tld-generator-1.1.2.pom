@@ -9,6 +9,12 @@
     <name>TLD generator</name>
     <url>https://github.com/indigobyte/tld-generator</url>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.1</version>
+    </parent>
+
     <distributionManagement>
         <repository>
             <id>internal.repo</id>
@@ -18,44 +24,34 @@
     </distributionManagement>
 
     <properties>
+        <java.version>15</java.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-        <maven.install.plugin.version>2.5.2</maven.install.plugin.version>
         <copy.rename.maven.plugin.version>1.0.1</copy.rename.maven.plugin.version>
-
-        <jaxb.api.version>2.3.0</jaxb.api.version>
-        <glassfish-jaxb.version>2.3.4</glassfish-jaxb.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>${glassfish-jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-xjc</artifactId>
-            <version>${glassfish-jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-jxc</artifactId>
-            <version>${glassfish-jaxb.version}</version>
         </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
+            <artifactId>javax.servlet.jsp-api</artifactId>
+            <version>2.3.3</version>
         </dependency>
     </dependencies>
 
@@ -195,7 +191,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-install-plugin</artifactId>
-                        <version>${maven.install.plugin.version}</version>
                         <configuration>
                             <skip>true</skip>
                         </configuration>
@@ -235,7 +230,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-install-plugin</artifactId>
-                        <version>${maven.install.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>install-to-mvn-repo</id>
@@ -263,10 +257,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
                     <parameters>true</parameters>
                     <proc>none</proc>
                 </configuration>
@@ -274,7 +265,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
